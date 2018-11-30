@@ -1,0 +1,35 @@
+{
+  "name": "swarm.io",
+  "version": "1.0.0",
+  "description": "Fun multiplayer game. Defeat enemies, grow your swarm!",
+  "main": "app.js",
+  "dependencies": {
+    "express": "^4.16.4",
+    "socket.io": "^2.1.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+	"start": "node app.js"
+  },
+  "keywords": [
+    "Multiplayer",
+    "Fun",
+    "Free",
+    "Online",
+    "io",
+    "popular",
+    "best",
+    "swarm",
+    "cyclone",
+    "swarm2",
+    "swarm.io",
+	"HTML5"
+  ],
+  "author": "Jaazib Mirza",
+  "license": "MPL-2.0",
+  "engines": {
+    "node": "10.12.0",
+	"npm": "6.4.1"
+  }
+}
