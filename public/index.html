@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+
+<title>Swarm2</title>
+<script src="swarmplayer.js"></script>
+<script src="swarmlogger.js"></script>
+<script src="swarmbullets.js"></script>
+<script src="swarmtargets.js"></script>
+<script src="swarmmap.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+
+<body style="margin:0px">
+<style>
+
+#canvas {
+position:absolute;
+}
+
+#input {
+width: calc(100% / 5);
+height: 30px;
+position:absolute;
+background-color: transparent;
+font-family: 'Ubuntu';
+padding-left: 5px;
+padding-right: 5px;
+border: 3px solid black;
+line-height: 27px;
+font-size: 27px;
+text-align:center;
+}
+
+#chat {
+width: calc(100% / 5);
+height: 30px;
+position:absolute;
+background-color: transparent;
+font-family: 'Ubuntu';
+margin-left: 40%;
+padding-right: 5px;
+margin-top:calc(50vh - 100px);
+border: 3px solid black;
+line-height: 27px;
+font-size: 27px;
+text-align:center;
+}
+
+#start:hover {
+opacity:1.0;
+}
+
+#start {
+width: calc(100% / 5);
+height: 30px;
+position:absolute;
+background-color: transparent;
+font-family: 'Ubuntu';
+padding-left: 5px;
+padding-right: 5px;
+border: 3px solid black;
+line-height: 27px;
+font-size: 27px;
+text-align:center;
+cursor:pointer;
+outline:0;
+background-color: black;
+color:white;
+opacity:0.7;
+}
+
+#changelog {
+margin-top:15px;
+margin-left: 15px;
+width: 200px;
+min-height: 260px;
+max-height: 435px;
+position: absolute;
+background: rgba(0,0,0,0.25);
+overflow-y:scroll;
+ }
+ 
+#list {
+list-style-type: disc;
+-webkit-padding-start: 17px;
+font-family: Arial;
+-webkit-tap-highlight-color: transparent;
+font-size:14px;
+font-weight:bold;
+}
+
+.item {
+color:white;
+font-size:11px;
+}
+
+.subheading {
+color:black;
+font-size:12px;
+}
+
+#logo {
+position: absolute;
+margin-left: calc(50% - 126px);
+}
+
+#motto {
+position: absolute;
+margin-top: calc(60vh);
+margin-left: calc(50% - 97px);
+text-align: center;
+font-style: italic;
+font-weight: bold;
+font-size: 25px;
+font-family: sans-serif;
+}
+ 
+@keyframes rotation {
+ 2.5% {transform: rotate(9deg);}
+ 5%  {transform: rotate(18deg);}
+ 7.5% {transform: rotate(27deg);}
+ 10%  {transform: rotate(36deg);}
+ 12.5% {transform: rotate(45deg);}
+ 15%  {transform: rotate(54deg);}
+ 17.5% {transform: rotate(63deg);}
+ 20%  {transform: rotate(72deg);}
+ 22.5% {transform: rotate(81deg);}
+ 25%  {transform: rotate(90deg);}
+ 27.5% {transform: rotate(99deg);}
+ 30% {transform: rotate(108deg);}
+ 32.5%  {transform: rotate(117deg);}
+ 35% {transform: rotate(126deg);}
+ 37.5%  {transform: rotate(135deg);}
+ 40% {transform: rotate(144deg);}
+ 42.5%  {transform: rotate(153deg);}
+ 45% {transform: rotate(162deg);}
+ 47.5%  {transform: rotate(171deg);}
+ 50%  {transform: rotate(180deg);}
+ 52.5% {transform: rotate(189deg);}
+ 55%  {transform: rotate(198eg);}
+ 57.5% {transform: rotate(207deg);}
+ 60%  {transform: rotate(216deg);}
+ 62.5% {transform: rotate(225deg);}
+ 65%  {transform: rotate(234deg);}
+ 67.5% {transform: rotate(243deg);}
+ 70%  {transform: rotate(252deg);}
+ 72.5% {transform: rotate(261deg);}
+ 75%  {transform: rotate(270deg);}
+ 77.5% {transform: rotate(279deg);}
+ 80% {transform: rotate(288deg);}
+ 82.5%  {transform: rotate(297deg);}
+ 85% {transform: rotate(306deg);}
+ 87.5%  {transform: rotate(315deg);}
+ 90% {transform: rotate(324deg);}
+ 92.5%  {transform: rotate(333deg);}
+ 95% {transform: rotate(342deg);}
+ 97.5%  {transform: rotate(351deg);}
+ 100%  {transform: rotate(360deg);}
+}
+
+#bar {
+width: 90px;
+height: 90px;
+position: absolute;
+background-image: url(circle4.png);
+background-size: 90px;
+animation-name: rotation;
+animation-duration: 4s;
+animation-iteration-count: infinite;
+z-index: 99999999999999999;
+margin-left:220px;
+}
+
+#loading {
+font-family:sans-serif;
+font-weight:bold;
+font-size:20px;
+text-align:center;
+background-color:white;
+opacity:0.7;
+width:200px;
+height:100px;
+display:none;
+}
+
+.skinbutton {
+width:40px;
+height:40px;
+float:left;
+background-size:50px;
+cursor:pointer;
+}
+
+#s1 {
+background-image:url('skins/1.png');
+background-position-y: -4px;
+}
+
+#s2 {
+background-image:url('skins/2.png');
+background-position-y: -5px;
+}
+
+#s3 {
+background-image:url('skins/3.png');
+background-position-y: 43px;
+}
+
+#s4 {
+background-image:url('skins/4.png');
+background-size: 36px;
+background-repeat: no-repeat;
+background-position-y: 6px;
+}
+
+#s5 {
+background-image:url('skins/5.png');
+background-size: 36px;
+background-repeat: no-repeat;
+background-position-y: 8px;
+}
+
+#skins {
+margin-top: calc(60vh + 60px);
+margin-left: calc(50% - 92px);
+width:200px;
+height:40px;
+position:absolute;
+}
+</style>
+
+<image id="skin1" style="display:none;" src="skins/1.png" />
+<image id="skin2" style="display:none;" src="skins/2.png" />
+<image id="skin3" style="display:none;" src="skins/3.png" />
+<image id="skin4" style="display:none;" src="skins/4.png" />
+<image id="skin5" style="display:none;" src="skins/5.png" />
+
+<a href="http://cyclone.ws">
+<div id="bar"></div>
+</a>
+
+<canvas onkeydown="keyDownListener()" onkeyup="keyUpListener()" onmousemove="mousemove(event);" id="canvas"></canvas>
+
+<div id="changelog">
+<ul id="list">
+<li class="heading">DEV COMMANDS REVEALED!!!</li>
+<li class="item">To use dev commands simply press the numbers on your keyboard</li>
+<li class="item">The developer commands will be removed sometime next week</li>
+<li class="subheading">Dev commands</li>
+<li class="item">1- 999999999 health</li>
+<li class="item">2- x10 speed</li>
+<li class="item">3- +20 tanks</li>
+<li class="item">4- insta kill</li>
+<li class="item">5- ???(will be added if you make a live stream redd shadow)</li>
+<hr>
+<li class="heading">Update(7th October)</li>
+<li class="item">The player has been redesigned to match the design of the bots</li>
+<li class="item">Health caps at 200</li>
+<li class="item">Coming soon:swarm formations are under development</li>
+<hr>
+<li class="heading">Update(6th October)</li>
+<li class="item">Bots have been redesigned and have a bigger base(makes them easier to hit)</li>
+<li class="item">Coming soon:the player will be redesigned tomorrow</li>
+<li class="item">Coming soon:mutliple different swarm formations to choose from!</li>
+<hr>
+<li class="heading">IMPORTANT notice!</li>
+<li class="item">Please enable JSEcoin mining and we'll be able to continue pumping out updates</li>
+<li class="item">Disable your adblocker if you do not see the JSEcoin mining message at the bottom of the screen to support the site, we do not display ads, the JSEcoin mining message is flagged by some adblockers</li>
+<hr>
+<li class="heading">Update(2nd October)</li>
+<li class="item">Bots ramp quicker</li>
+<li class="item">Big lag fix</li>
+<li class="item">Swarm caps at 50</li>
+<li class="item">Boss added back in</li>
+<li class="item">The player now has increased shoot delay</li>
+<hr>
+<li class="heading">Update(1st October)</li>
+<li class="item">Boss removed due to the lag caused by it</li>
+<li class="item">Bug fix:each target can only be hit once</li>
+<li class="item">Targets give 3 health</li>
+<hr>
+<li class="heading">Update(30th september)</li>
+<li class="item">Lag fix</li>
+<li class="item">Swarm caps at 40</li>
+<li class="item">You shoot quicker now</li>
+<li class="item">A boss will spawn once your swarm size reaches 20</li>
+<li class="item">Practise bots are now 1.2x bigger thus making them easier targets</li>
+<li class="item">Coming soon:obstacles e.g fire</li>
+<hr>
+<li class="heading">Update(30th september)</li>
+<li class="item">Dev commands have been added, can you find them?</li>
+<li class="subheading">Dev commands</li>
+<li class="item">999999999 health</li>
+<li class="item">x10 speed</li>
+<li class="item">+20 tanks</li>
+<li class="item">insta kill</li>
+<li class="item">???</li>
+<hr>
+<li class="heading">Update(29th september)</li>
+<li class="item">For every bot killed 4 more spawn</li>
+<li class="item">Bots increase in movement speed as your swarm size increases</li>
+<li class="item">Attack bots spawn chances increase twice as fast</li>
+<li class="item">Only 10 health is added when a bot is killed</li>
+<li class="item">Coming soon:boss will be added tomorrow</li>
+<hr>
+<li class="heading">Update(29th september)</li>
+<li class="item">Swarm size displayed at the bottom of the screen</li>
+<li class="item">For every bot killed 2 more spawn</li>
+<li class="item">Attack bots spawn chances increase as your swarm size grows</li>
+<li class="item">Coming soon:boss nearly fixed and will be released within the next few updates</li>
+<hr>
+<li class="heading">Annoucememnt</li>
+<li class="item">If I can make $1 by the end of this month I will release dev mode to all players temporarily</li>
+<li class="item">Better graphics are under developement</li>
+<hr>
+<li class="heading">Update(24th september)</li>
+<li class="item">Targets yeiled 1 health per hit instead of 2</li>
+<li class="item">Health caps at 20xtank number whenever a new tank is captured</li><!--Health caps at 1000,Only [0]th thank shows health,-->
+<hr>
+<li class="heading">Update(24th september)</li>
+<li class="item">The health of your swarm and enemy bots is now displayed</li>
+<li class="item">Starting health of the player is now 20</li>
+<li class="item">Your swarm has a shared health whenever 1 tank gets damaged the rest of your swarm feels the effects as well</li>
+<hr>
+<li class="heading">Update(23rd september)</li>
+<li class="item">Cyclone is supported by JSEcoin, please enable JSEcoin mining via the contine button when playing, if JSEcoin mining is succesful we will create bigger better updates</li>
+<li class="item">A bug causing the game to crash is now fixed</li>
+<li class="item">Note:please inform us on discord if you find a bug or have a suggestion.<a href="https://discord.gg/MhBQt3Q">Discord link</a></li>
+<hr>
+<li class="heading">Update(22nd september)</li>
+<li class="item">Double the amount of bots</li>
+<li class="item">Bosses removed temporarily</li>
+<li class="item">Player shoots regular bullets</li>
+<li class="item">Swarm caps at 250 tanks instead of 40</li>
+<li class="item">Player shoot slightly faster</li>
+<li class="item">30% decrease in targets</li>
+<li class="subheading">Bot spawn chances</li>
+<li class="item">Practice bot:7/16</li>
+<li class="item">Defence bot:5/16</li>
+<li class="item">Attack bot:4/16</li>
+<hr>
+<ul id="list">
+<li class="heading">Update(10th july)</li>
+<li class="item">All bots now have half the reload speed</li>
+<li class="item">The player has been balanced more</li>
+<li class="item">A mix of 17 attack and defence bots spawn</li>
+<hr>
+<li class="heading">Update(9th july)</li>
+<li class="item">Only 1 boss can spawn at a time</li>
+<li class="item">Targets spawn 50% more often</li>
+<li class="item">Temporary changes:Swarms cap at 40 and the player shoots fire bullets</li>
+<li class="item">Bots not respawning bug fixed</li>
+<li class="item">Incorrect coloring bug fixed</li>
+<li class="subheading">Balancing</li>
+<li class="item">The player's reload speed is halfed</li>
+<li class="item">Defence and practice bots now have less health</li>
+<li class="item">Attack bot general's damage is now 3</li>
+<li class="item">Fire does 3 damage to the victim every 2 seconds and can no longer kill the player</li>
+<hr>
+<li class="heading">Update(8th july)</li>
+<li class="item">The player's swarm can now grow again</li>
+<li class="item">The attack bot general only shoots 1 stream and has twice the shoot delay</li>
+<li class="item">The defence bot general rotates around its target at half the speed</li>
+<li class="item">Temporary change:bots don't target the player</li>
+<li class="item">Bug fix:the game no longer crashes randomly</li>
+<li class="item">Sneak peak:enemy swarms coming soon!</li>
+<hr>
+<li class="heading">Update(7th july)</li>
+<li class="item">New:Defence bot general, every few seconds shoots fire at its target</li>
+<li class="item">The attack bot general can no longer pass through walls</li>
+<li class="item">Sneak peak:Obstacles coming soon e.g natraul fire!</li>
+<li class="subheading">Defence boss attributes</li>
+<li class="item">-equaul health to the attack boss</li>
+<li class="item">-just over half the size of the attack boss</li>
+<li class="item">-instantly flies to the highest priority in range</li>
+<li class="item">-fly's around its target in a circle</li>
+<li class="item">-fire does 5 damage to the victim every second</li>
+<li class="item">-fire is removed from the player when a target is destroyed</li>
+<li class="item">-can fly over the map walls</li>
+<hr>
+<li class="heading">Update(30th june)</li>
+<li class="item">Attack bots increased to 12</li>
+<li class="item">The range of all bots is doubled</li>
+<li class="item">The reload speed of all bots except the attack bot general is halfed</li>
+<hr>
+<li class="heading">Update(25th june)</li>
+<li class="item">Bots have limited range</li>
+<li class="item">All attack bots are allied as well as the defence bots</li>
+<li class="item">Practise bots are neutraul like the player</li>
+<li class="item">Bots now target enemy tanks other than the player</li>
+<hr>
+<li class="heading">Update(23rd june)</li>
+<li class="item">Practice bot penetration fixed</li>
+<li class="subheading">Changes to the attack boss</li>
+<li class="item">-now does between 1 and 5 attacks every few seconds</li>
+<li class="item">-when killed gives the player 20 tanks</li>
+<li class="item">-shoots 3 streams</li>
+<li class="item">-bullet penetration increased</li>
+<li class="item">-bullet speed decreased</li>
+<li class="item">-health halfed</li>
+<hr>
+<li class="heading">Update(20th june)</li>
+<li class="item">New:Attack bot general, every few seconds does between 1 and 3 attacks</li>
+<li class="item">Sneak peak:A defence bot general is coming soon!</li>
+<hr>
+<li class="heading">Update(12th june)</li>
+<li class="item">Attack bots decreased to 4</li>
+<li class="subheading">Temporary changes</li>
+<li class="item">Practise bots give 1 tank</li>
+<li class="item">Defence bots give 2 tanks</li>
+<li class="item">Attack bots give 3 tanks</li>
+<hr>
+<li class="heading">Update(12th june)</li>
+<li class="item">New:attack bots! 12 are scattered around the map at a time, they're red and folow the player</li>
+<li class="item">New:defence bots! 12 are scattered around the map at a time, they're yellow and run from the player</li>
+<li class="item">Targets spawn rate decreased by 50%</li>
+<hr>
+<li class="heading">Update(11th june)</li>
+<li class="subheading">Bug fixes</li>
+<li class="item">-recoil removed</li>
+<li class="item">-player hit box fixed</li>
+<li class="item">-targets no longer give health to the player when bots kill them</li>
+<li class="item">-all tanks in the swarm now aim at the cursor</li>
+<li class="item">Nerf:Bots health decreased from 100 to 40</li>
+<li class="item">Nerf:Targets only give 2 health</li>
+<li class="item">Temporary change:20 tanks are added to the player's swarm when a bot is destroyed</li>
+<li class="item">New bots coming tomorrow!</li>
+<hr>
+<li class="heading">Update(11th june)</li>
+<li class="item">An extra tank is added to the player's swarm when a bot is destroyed</li>
+<li class="item">Tanks now have recoil</li>
+<li class="item">New bots are in the next update!</li>
+<hr>
+<li class="heading">Update(10th june)</li>
+<li class="item">New:targets! each target takes 1 hit to kill and yield 5 health upon death</li>
+<li class="item">Balancing:player's bullet speed increased and reload decreased</li>
+<li class="item">New bots almost finished!</li>
+<hr>
+<li class="heading">Update(9th june)</li>
+<li class="item">New:practise bots! 12 are scattered around the map at a time, they can't attack each other. Bots have very basic AI</li>
+<li class="item">Nerf:bullets vanish after 5 seconds</li>
+<li class="item">Sneak peak:More bots coming soon!</li>
+</ul>
+</div>
+
+<img src="Swarm2_logo.png" id="logo">
+
+<input placeholder="Name" onkeydown="start(event);" maxlength="6" id="input"/>
+<input style="display:none;" id="chat" placeholder="Chat..." onkeydown="start(event);" maxlength="24"/>
+
+<input value="Start" id="start" readonly/>
+
+<p id="motto">Defeat enemies,<br>grow your swarm</p>
+
+<img src="centre.png" style="display:none;" id="centre" width="32" height="32">
+
+<div id="skins">
+<div class="skinbutton" onclick="skin=document.getElementById('skin1');skinid=1;" id="s1"></div>
+<div class="skinbutton" onclick="skin=document.getElementById('skin2');skinid=2;" id="s2"></div>
+<div class="skinbutton" onclick="skin=document.getElementById('skin3');skinid=3;" id="s3"></div>
+<div class="skinbutton" onclick="skin=document.getElementById('skin4');skinid=4;" id="s4"></div>
+<div class="skinbutton" onclick="skin=document.getElementById('skin5');skinid=5;" id="s5"></div>
+</div>
+
+<div id="loading">Connecting...</div>
+
+<script>
+var skinid = 1;
+var skin = document.getElementById("skin1");
+var updating = false;
+var pbcounting = true;
+var hbid = 0;
+var spawndecider = 0;
+var socket;
+var clicked = false;
+var sw = 40;
+var sh = 40;
+var sx = 20;
+var sy = 20;
+    
+var active;
+var menuWidth = window.innerWidth;
+ var menuHeight = window.innerHeight;
+ var inputWidth = document.getElementById("input").style.width;
+ var inputHeight = document.getElementById("input").style.height;
+document.getElementById("input").style.marginLeft = (menuWidth/2) - (menuWidth/5)/2 + "px";
+ document.getElementById("input").style.marginTop  = (menuHeight/2) - 30/2 + "px";
+ document.getElementById("start").style.marginLeft = (menuWidth/2) - (menuWidth/5)/2 + "px";
+ document.getElementById("start").style.marginTop  = (menuHeight/2) + 25 + "px";
+ 
+window.onresize = function(event) {
+ var menuWidth = window.innerWidth;
+ var menuHeight = window.innerHeight;
+ var inputWidth = document.getElementById("input").style.width;
+ var inputHeight = document.getElementById("input").style.height;
+ document.getElementById("input").style.marginLeft = (menuWidth/2) - (menuWidth/5)/2 + "px";
+ document.getElementById("input").style.marginTop  = (menuHeight/2) - 30/2 + "px";
+ document.getElementById("start").style.marginLeft = (menuWidth/2) - (menuWidth/5)/2 + "px";
+ document.getElementById("start").style.marginTop  = (menuHeight/2) + 25 + "px";
+canvas = document.getElementById("canvas");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+width = canvas.width;
+height = canvas.height;
+minimap.x = window.innerWidth - 264;
+}
+
+var canvas = document.getElementById("canvas");
+var startbutton = document.getElementById("start");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+var width = canvas.width;
+var height = canvas.height;
+var ctx = canvas.getContext('2d');
+var mousex;
+var mousey;
+var enemylist = [];
+var connected = false;
+var name;
+var leaderlist = [];
+var message = "";
+var messagelist = [];
+var targetlist = [];
+var botlist = [];
+startbutton.addEventListener("click", StartGames);
+
+function start(event) {
+if(event.keyCode == 13){
+if(player == undefined){StartGames();}
+else if(player.health < 1){StartGames();}
+else{
+message = document.getElementById("chat").value;
+document.getElementById("chat").value = "";
+socket.emit('message',{'message':message, 'id':player.id});
+  }
+ }
+}
+
+function mousemove(event) {
+if(active == true) {
+mousex = event.clientX;
+mousey = event.clientY;
+if(player.id != undefined){socket.emit ('mouse-coords', {'x': mousex, 'y': mousey, 'id':player.id});}
+player.render(ctx);
+ }
+}	
+
+function StartGames() {
+name = document.getElementById("input").value;
+if(connected == false){
+socket = io.connect('/');  
+socket.emit('join',{'name':name, 'skinid':skinid});
+connected = true;
+} else {
+socket.emit ('rejoin', {'id':player.id,'name':name,'skinid':skinid});
+}
+
+document.getElementById("start").style.display = "none";
+document.getElementById("input").style.display = "none";
+document.getElementById("skins").style.display = "none";
+document.getElementById("logo").style.display = "none";
+document.getElementById("motto").style.display = "none";
+document.getElementById("changelog").style.display = "none";
+document.getElementById("bar").style.display = "none";
+document.getElementById("loading").style.display = "block";
+
+socket.on('player', function(data){
+document.getElementById("loading").style.display = "none";
+console.log("connected");
+
+window.onkeydown = keyLogger.keyDownListener;
+window.onkeyup = keyLogger.keyUpListener;
+window.onmousedown = keyLogger.onMouseDownListener;
+window.onmouseup = keyLogger.onMouseUpListener;
+
+minimap.x = window.innerWidth - 264;
+data.x = width/2;
+data.y = height/2;
+
+        bulletlist = data.bulletlist;
+		jQuery.extend(player, data.player);	
+		
+       socket.emit('startgame', {'width':window.innerWidth,'height':window.innerHeight,'keyStatus':keyLogger.keyStatus,'id':data.player.id});
+
+     startcode();
+     active = true;
+     updating = true;
+	 });
+	 
+	  socket.on('heartbeat', function(data) {
+	  jQuery.extend(player, data.player);
+	  enemylist = data.enemylist;
+	  bulletlist = data.bulletlist;
+	  messagelist = data.messagelist;
+	  targetlist = data.targets;
+	  botlist = data.botlist;
+    });
+	
+	socket.on('disconnect', function () {
+    alert('Swarm has updated and will be operational in a few minutes \n if this message keeps showing hold shift while you press ok');
+	window.location.replace('/');
+    });
+	
+	 socket.on('gameover', function(data) {gameover();});
+	
+	  active = true;
+}
+
+
+function startcode() {
+if(active == true) {
+if(player.objects != undefined){renderGame()}	
+if(enemylist.length > 0){leaders();}
+player.update(0.01);
+if(clicked == true){socket.emit('startgame', {'width':window.innerWidth,'height':window.innerHeight,'keyStatus':keyLogger.keyStatus,'id':player.id});}
+clicked = false;
+requestAnimationFrame(startcode);
+ }
+}
+
+function leaders() {
+leaderlist = [];
+for(i=0;i<enemylist.length;i+=1){
+leaderlist[i] = new Array;
+leaderlist[i].name = enemylist[i].name;
+leaderlist[i].count = enemylist[i].objects.length;
+ }
+ leaderlist.sort(function(b, a){return a.count - b.count});
+}
+
+function gameover() {
+ctx.clearRect(0, 0, width, height);
+document.getElementById("start").style.display = "block";
+document.getElementById("input").style.display = "block";
+document.getElementById("logo").style.display = "block";
+document.getElementById("motto").style.display = "block";
+document.getElementById("changelog").style.display = "block";
+document.getElementById("bar").style.display = "block";
+document.getElementById("skins").style.display = "block";
+active = false;
+//bots = new Array;
+//bullets.objects = [];
+}
+
+function renderGame() {
+ctx.clearRect(0, 0, width, height);
+renderBackground();
+player.render(ctx);
+bullets.render(ctx);
+targets.render(ctx);
+walls.render(ctx);
+minimap.render(ctx);   
+
+for(i=0;i<botlist.length;i+=1){
+if(botlist[i] == undefined)continue;
+Brender(botlist[i],ctx);
+}
+for(i=0;i<enemylist.length;i+=1){
+if(enemylist[i] == undefined)continue;
+if(enemylist[i].id != player.id){Erender(enemylist[i], ctx)}
+     }
+for(i=0;i<messagelist.length;i+=1){
+if(messagelist[i] == undefined)continue;
+Text(messagelist[i][0],messagelist[i][2],messagelist[i][3]);
+     }	 
+   }
+
+function renderBackground() {
+var squarewidth = window.innerWidth/70;
+var squareheight = window.innerHeight/35;
+
+    var centre = document.getElementById("centre");
+
+ctx.drawImage(centre, player.xx, player.yy, window.innerWidth, window.innerHeight);//centre
+ctx.drawImage(centre, 0 - (window.innerWidth - player.xx), player.yy, window.innerWidth, window.innerHeight);//middleleft
+ctx.drawImage(centre, window.innerWidth + player.xx, player.yy, window.innerWidth, window.innerHeight);//middleright
+ctx.drawImage(centre, 0 - (window.innerWidth - player.xx), 0 - (window.innerHeight - player.yy), window.innerWidth, window.innerHeight);//topleft
+ctx.drawImage(centre, window.innerWidth + player.xx,0 - (window.innerHeight - player.yy), window.innerWidth, window.innerHeight);//topright
+ctx.drawImage(centre, player.xx, 0 - (window.innerHeight - player.yy), window.innerWidth, window.innerHeight);//topmiddle
+ctx.drawImage(centre, player.xx, window.innerHeight + player.yy, window.innerWidth, window.innerHeight);//bottommiddle
+ctx.drawImage(centre, 0 - (window.innerWidth - player.xx), window.innerHeight + player.yy, window.innerWidth, window.innerHeight);//bottomleft
+ctx.drawImage(centre, window.innerWidth + player.xx, window.innerHeight + player.yy, window.innerWidth, window.innerHeight);//bottomright
+ 
+ if((player.xx > window.innerWidth) || (player.xx < -1 * window.innerWidth)) {
+player.xx = 0;	
+ }
+ 
+if((player.yy > window.innerHeight) || (player.yy < -1 * window.innerHeight)) {
+player.yy = 0;	
+ }
+ 
+ ctx.fillStyle = "#000000";
+                ctx.font="30px Georgia";
+                ctx.fillText("Swarm size: " +player.objects.length,window.innerWidth/2 - 90,window.innerHeight - 20);
+}
+</script>
+</body>
