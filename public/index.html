@@ -480,6 +480,12 @@ var sw = 40;
 var sh = 40;
 var sx = 20;
 var sy = 20;
+	
+	 var doVisualUpdates = true;
+
+    document.addEventListener('visibilitychange', function(){
+      doVisualUpdates = !document.hidden;
+    });
     
 var active;
 var menuWidth = window.innerWidth;
